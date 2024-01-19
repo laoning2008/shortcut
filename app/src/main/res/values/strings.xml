@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">shortcut</string>
+    <string name="title_activity_main">所有快捷指令</string>
+    <string name="title_all_shortcut">快捷指令</string>
+    <string name="title_automation">自动化</string>
+    <string name="title_shortcut_center">快捷指令中心</string>
+
+    <string name="title_create_shortcut">创建快捷指令</string>
+</resources>

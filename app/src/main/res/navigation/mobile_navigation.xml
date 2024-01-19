@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_all_shortcut">
+
+    <fragment
+        android:id="@+id/navigation_all_shortcut"
+        android:name="com.byd.shortcut.app.view.main.shortcuts.AllShortcutFragment"
+        android:label="@string/title_all_shortcut"
+        tools:layout="@layout/fragment_my_shortcut" />
+
+    <fragment
+        android:id="@+id/navigation_automation"
+        android:name="com.byd.shortcut.app.view.main.automation.AutomationFragment"
+        android:label="@string/title_automation"
+        tools:layout="@layout/fragment_automation" />
+
+    <fragment
+        android:id="@+id/navigation_shortcut_center"
+        android:name="com.byd.shortcut.app.view.main.shortcutcenter.ShortcutCenterFragment"
+        android:label="@string/title_shortcut_center"
+        tools:layout="@layout/fragment_shortcut_center" />
+</navigation>
