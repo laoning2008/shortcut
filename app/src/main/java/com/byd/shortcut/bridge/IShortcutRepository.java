@@ -7,9 +7,11 @@ import java.util.List;
 public interface IShortcutRepository {
     boolean createShortcut(Shortcut shortcut);
 
-    boolean deleteShortcut(long id);
+    boolean deleteShortcut(String id);
 
     boolean updateShortcut(Shortcut shortcut);
 
     LiveData<List<Shortcut>> getAllShortcut();
+
+    boolean moveShortcut(int fromPosition, int toPosition);
 }

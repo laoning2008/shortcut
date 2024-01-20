@@ -1,12 +1,8 @@
-package com.byd.shortcut.app.model.service;
-
-import static android.content.Context.BIND_AUTO_CREATE;
+package com.byd.shortcut.app.service;
 
 import android.content.ComponentName;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import com.byd.shortcut.IShortcutServiceApi;
 import com.byd.shortcut.app.common.ServiceUtil;

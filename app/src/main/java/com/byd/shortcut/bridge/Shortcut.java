@@ -5,15 +5,14 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
-
 public class Shortcut implements Parcelable {
-    public long id;
+    public String id;
     public long modifiedTime = 0L;
     public int type = 0;
     public String title;
     public ArrayList<Action> tasks;
 
-    public Shortcut(long id, long modifiedTime, int type, String title, ArrayList<Action> tasks) {
+    public Shortcut(String id, long modifiedTime, int type, String title, ArrayList<Action> tasks) {
         this.id = id;
         this.modifiedTime = modifiedTime;
         this.type = type;
@@ -28,7 +27,7 @@ public class Shortcut implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeLong(id);
+        dest.writeString(id);
         dest.writeLong(modifiedTime);
         dest.writeInt(type);
         dest.writeString(title);
@@ -42,7 +41,7 @@ public class Shortcut implements Parcelable {
     public static final Parcelable.Creator<Shortcut> CREATOR = new Parcelable.Creator<Shortcut>() {
         @Override
         public Shortcut createFromParcel(Parcel source) {
-            long id = source.readLong();
+            String id = source.readString();
             long modifiedTime = source.readLong();
             int type = source.readInt();
             String title = source.readString();

@@ -1,4 +1,4 @@
-package com.byd.shortcut.app.model;
+package com.byd.shortcut.app.service;
 
 public class ServiceMgr {
     private static ServiceMgr sInstance = new ServiceMgr();

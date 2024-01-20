@@ -5,10 +5,10 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.byd.shortcut.app.common.MiscUtils;
 import com.byd.shortcut.app.data.ShortcutRepository;
-import com.byd.shortcut.app.model.ServiceMgr;
 import com.byd.shortcut.bridge.Action;
 import com.byd.shortcut.bridge.Shortcut;
 
@@ -19,18 +19,22 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
-@HiltViewModel
 public class CreateShortcutViewModel extends ViewModel {
     private ShortcutRepository repository;
+    private Shortcut shortcut;
 
-    private final MutableLiveData<String> title;
-    private final MutableLiveData<ArrayList<Action>> actions;
+    private final MutableLiveData<String> title = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<Action>> actions = new MutableLiveData<>();
 
-    @Inject
-    public CreateShortcutViewModel(ShortcutRepository repository) {
+    public CreateShortcutViewModel(ShortcutRepository repository, Shortcut shortcut) {
         this.repository = repository;
-        title = new MutableLiveData<>();
-        actions = new MutableLiveData<>();
+        this.shortcut = shortcut;
+
+        if (shortcut != null) {
+            title.setValue(shortcut.title);
+            actions.setValue(shortcut.tasks);
+        }
+
         if (actions.getValue() == null || actions.getValue().isEmpty()) {
             addNewAction();
         }
@@ -40,7 +44,7 @@ public class CreateShortcutViewModel extends ViewModel {
         return title;
     }
 
-    public LiveData<ArrayList<Action>> getActons() {
+    public LiveData<ArrayList<Action>> getActions() {
         return actions;
     }
 
@@ -51,8 +55,6 @@ public class CreateShortcutViewModel extends ViewModel {
         }
 
         long id =  MiscUtils.uniqueId();
-        Log.d("shortcut", "addNewAction, id = " + id);
-
         newActions.add(new Action(id, 0, new String(), new String(), new String()));
         actions.setValue(newActions);
     }
@@ -100,8 +102,47 @@ public class CreateShortcutViewModel extends ViewModel {
         }
     }
 
+    public void moveShortcut(int fromPosition, int toPosition) {
+        if (fromPosition == toPosition) {
+            return;
+        }
+
+        ArrayList<Action> actionArrayList = actions.getValue();
+        Action item = actionArrayList.remove(fromPosition);
+        actionArrayList.add(toPosition, item);
+        actions.setValue(actionArrayList);
+    }
+
+    public void deleteAction(Action action) {
+        ArrayList<Action> actionArrayList = actions.getValue();
+        actionArrayList.remove(action);
+        actions.setValue(actionArrayList);
+    }
+
     public void saveShortcut() {
-        Shortcut shortcut = new Shortcut(0, System.currentTimeMillis(), 0, title.getValue(), actions.getValue());
-        repository.createShortcut(shortcut);
+        if (shortcut == null) {
+            Shortcut newShortcut = new Shortcut(MiscUtils.uniqueIdString(), System.currentTimeMillis(), 0, title.getValue(), actions.getValue());
+            repository.createShortcut(newShortcut);
+        } else {
+            shortcut.title = title.getValue();
+            shortcut.tasks = actions.getValue();
+            repository.updateShortcut(shortcut);
+        }
+    }
+
+
+    public static class ViewModelFactory implements ViewModelProvider.Factory {
+        private ShortcutRepository repository;
+        private Shortcut shortcut;
+
+        public ViewModelFactory(ShortcutRepository repository, Shortcut shortcut) {
+            this.repository = repository;
+            this.shortcut = shortcut;
+        }
+
+        @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new CreateShortcutViewModel(repository, shortcut);
+        }
     }
 }

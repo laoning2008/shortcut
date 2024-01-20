@@ -28,4 +28,12 @@ public class MiscUtils {
         return Math.abs((mostSignificantBits << 32) | (leastSignificantBits & 0xFFFFFFFFL));
     }
 
+    public static String uniqueIdString() {
+        UUID uniqueUUID = UUID.randomUUID();
+        return uniqueUUID.toString();
+    }
+
+    public static long uniqueIdFromString(String s) {
+        return UUID.nameUUIDFromBytes(s.getBytes()).getMostSignificantBits();
+    }
 }

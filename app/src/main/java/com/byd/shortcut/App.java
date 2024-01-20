@@ -2,11 +2,10 @@ package com.byd.shortcut;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.byd.shortcut.app.common.ServiceUtil;
-import com.byd.shortcut.app.model.ServiceMgr;
-import com.byd.shortcut.app.model.service.ServiceBinder;
+import com.byd.shortcut.app.service.ServiceMgr;
+import com.byd.shortcut.app.service.ServiceBinder;
 
 import dagger.hilt.android.HiltAndroidApp;
 

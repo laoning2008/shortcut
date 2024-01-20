@@ -1,4 +1,4 @@
-package com.byd.shortcut.app.model.service;
+package com.byd.shortcut.app.service;
 
 import com.byd.shortcut.IShortcutServiceApi;
 

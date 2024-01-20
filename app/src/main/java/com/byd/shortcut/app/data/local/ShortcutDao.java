@@ -5,30 +5,50 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import java.util.List;
 
 @Dao
-public interface ShortcutDao {
-    @Query("SELECT * FROM shortcuts")
-    LiveData<List<DbShortcut>> getAll();
+public abstract class ShortcutDao {
+    @Query("SELECT * FROM shortcuts ORDER by ROWID")
+    public abstract LiveData<List<DbShortcut>> getAll();
+
+    @Query("SELECT * FROM shortcuts ORDER by ROWID")
+    public abstract List<DbShortcut> getAllRaw();
 
     @Query("SELECT * FROM shortcuts WHERE id IN (:ids)")
-    LiveData<List<DbShortcut>> loadAllByIds(long[] ids);
+    public abstract LiveData<List<DbShortcut>> loadAllByIds(long[] ids);
 
     @Query("SELECT * FROM shortcuts WHERE id = :shortcutId")
-    LiveData<DbShortcut> findById(long shortcutId);
+    public abstract LiveData<DbShortcut> findById(long shortcutId);
 
     @Insert
-    void insertAll(DbShortcut... users);
+    public abstract void insertAll(DbShortcut... shortcuts);
+
+    @Insert
+    public abstract void insertAll2(List<DbShortcut> shortcuts);
 
     @Update
-    int update(DbShortcut shortcut);
+    public abstract int update(DbShortcut shortcut);
 
     @Delete
-    void delete(DbShortcut user);
+    public abstract void delete(DbShortcut shortcut);
+
+    @Query("DELETE FROM shortcuts")
+    public abstract void deleteAll();
 
     @Query("delete FROM shortcuts where id = :shortcutId")
-    void deleteById(long shortcutId);
+    public abstract void deleteById(String shortcutId);
+
+    @Transaction
+    public void move(int fromPosition, int toPosition) {
+        List<DbShortcut> shortcuts = getAllRaw();
+        DbShortcut item = shortcuts.remove(fromPosition);
+        shortcuts.add(toPosition, item);
+
+        deleteAll();
+        insertAll2(shortcuts);
+    }
 }

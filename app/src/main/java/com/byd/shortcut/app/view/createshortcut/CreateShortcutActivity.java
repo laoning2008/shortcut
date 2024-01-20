@@ -1,11 +1,15 @@
 package com.byd.shortcut.app.view.createshortcut;
 
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -17,7 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.byd.shortcut.R;
 import com.byd.shortcut.app.common.BaseActivity;
 import com.byd.shortcut.app.common.ConnectorListDividerDecorator;
+import com.byd.shortcut.app.data.ShortcutRepository;
 import com.byd.shortcut.bridge.Action;
+import com.byd.shortcut.bridge.Shortcut;
 import com.byd.shortcut.databinding.ActivityCreateShortcutBinding;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
@@ -26,10 +32,13 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class CreateShortcutActivity extends BaseActivity {
+    public static final String PARAM_KEY_SHORTCUT = "shortcut";
 
     private ActivityCreateShortcutBinding binding;
 
@@ -40,11 +49,20 @@ public class CreateShortcutActivity extends BaseActivity {
     private CreateShortcutViewModel viewModel;
     private ActionAdapter actionAdapter;
 
+    @Inject
+    ShortcutRepository shortcutRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(CreateShortcutViewModel.class);
+        Shortcut shortcut = null;
+        Bundle b = getIntent().getExtras();
+        if (b != null) {
+            shortcut = (Shortcut)b.getParcelable(PARAM_KEY_SHORTCUT, Shortcut.class);
+        }
+
+        viewModel = new ViewModelProvider(this, new CreateShortcutViewModel.ViewModelFactory(shortcutRepository, shortcut)).get(CreateShortcutViewModel.class);
 
         binding = ActivityCreateShortcutBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -83,8 +101,8 @@ public class CreateShortcutActivity extends BaseActivity {
         mRecyclerViewDragDropManager.setInitiateOnMove(false);
 
         //adapter
-        actionAdapter = new ActionAdapter(viewModel.getActons().getValue(), viewModel);
-        viewModel.getActons().observe(this, new Observer<List<Action>>() {
+        actionAdapter = new ActionAdapter(viewModel.getActions().getValue(), viewModel);
+        viewModel.getActions().observe(this, new Observer<List<Action>>() {
             @Override
             public void onChanged(List<Action> actions) {
                 actionAdapter.setData(actions);
@@ -102,6 +120,23 @@ public class CreateShortcutActivity extends BaseActivity {
         mRecyclerView.addItemDecoration(new ConnectorListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider_h)));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
+
+//        PackageManager pm = getPackageManager();
+//        List<PackageInfo> apps = pm.getInstalledPackages(PackageManager.GET_ACTIVITIES| PackageManager.GET_INTENT_FILTERS);
+//        for (PackageInfo info : apps) {
+//            Log.i("shortcut_tag", "packageName = " + info.packageName);
+//            if (info.activities == null) {
+//                continue;
+//            }
+//            for (ActivityInfo activityInfo: info.activities) {
+//                if (!activityInfo.exported || !activityInfo.enabled) {
+//                    continue;
+//                }
+//
+//
+//                Log.i("shortcut_tag", "name = " + activityInfo.name);
+//            }
+//        }
     }
 
     @Override
@@ -152,6 +187,8 @@ public class CreateShortcutActivity extends BaseActivity {
             return true;
         } else if (item.getItemId() == R.id.toolbar_menu_create_shortcut_add_action) {
             addNewAction();
+            return true;
+        } else if (item.getItemId() == R.id.toolbar_menu_create_shortcut_run) {
             return true;
         }
 

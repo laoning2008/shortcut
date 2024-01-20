@@ -36,7 +36,7 @@ public class ShortcutRepository implements IShortcutRepository {
         return true;
     }
 
-    public boolean deleteShortcut(long id) {
+    public boolean deleteShortcut(String id) {
         shortcutDao.deleteById(id);
         return true;
     }
@@ -49,5 +49,10 @@ public class ShortcutRepository implements IShortcutRepository {
 
     public LiveData<List<Shortcut>> getAllShortcut() {
         return allShortcut;
+    }
+
+    public boolean moveShortcut(int fromPosition, int toPosition) {
+        shortcutDao.move(fromPosition, toPosition);
+        return true;
     }
 }

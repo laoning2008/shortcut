@@ -22,4 +22,10 @@
         android:title="添加操作"
         app:iconTint="?attr/colorOnSecondary"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/toolbar_menu_create_shortcut_run"
+        android:icon="@drawable/baseline_directions_run_24"
+        android:title="运行"
+        app:iconTint="?attr/colorOnSecondary"
+        app:showAsAction="always"/>
 </menu>

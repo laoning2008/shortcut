@@ -18,44 +18,44 @@ package com.byd.shortcut.app.view.createshortcut;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.byd.shortcut.R;
-import com.byd.shortcut.app.common.ViewUtils;
 import com.byd.shortcut.bridge.Action;
-import com.google.android.material.internal.TextWatcherAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 
 import java.util.List;
 
-public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHolder> implements DraggableItemAdapter<ActionAdapter.MyViewHolder> {
+public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements DraggableItemAdapter<ActionAdapter.ViewHolder> {
     private List<Action> data;
     private CreateShortcutViewModel viewModel;
 
-    public static class MyViewHolder extends AbstractDraggableItemViewHolder {
+    public static class ViewHolder extends AbstractDraggableItemViewHolder {
         public View mContainer;
         public View mDragHandle;
 
         public EditText mEditTextParam;
         public EditText mEditTextApp;
         public EditText mEditTextAction;
+        public ImageView mImageRemove;
 
-        public MyViewHolder(View v) {
+        public ViewHolder(View v) {
             super(v);
             mContainer = v.findViewById(R.id.container);
             mDragHandle = v.findViewById(R.id.container);
             mEditTextParam = v.findViewById(R.id.et_param);
             mEditTextApp = v.findViewById(R.id.et_package);
             mEditTextAction = v.findViewById(R.id.et_action);
+            mImageRemove = v.findViewById(R.id.im_delete);
         }
     }
 
@@ -86,20 +86,20 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final View v = inflater.inflate(R.layout.list_item_action, parent, false);
-        return new MyViewHolder(v);
+        return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        final Action item = data.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final Action action = data.get(position);
 
         // set text
-        holder.mEditTextParam.setText(item.param);
-        holder.mEditTextApp.setText(item.app);
-        holder.mEditTextAction.setText(item.action);
+        holder.mEditTextParam.setText(action.param);
+        holder.mEditTextApp.setText(action.app);
+        holder.mEditTextAction.setText(action.action);
 
         holder.mEditTextParam.addTextChangedListener(new TextWatcher() {
             @Override
@@ -107,7 +107,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setActionParam(item.id, holder.mEditTextParam.getText().toString());
+                viewModel.setActionParam(action.id, holder.mEditTextParam.getText().toString());
             }
 
             @Override
@@ -120,7 +120,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setActionApp(item.id, holder.mEditTextApp.getText().toString());
+                viewModel.setActionApp(action.id, holder.mEditTextApp.getText().toString());
             }
 
             @Override
@@ -133,12 +133,20 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setActionAction(item.id, holder.mEditTextAction.getText().toString());
+                viewModel.setActionAction(action.id, holder.mEditTextAction.getText().toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        holder.mImageRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.deleteAction(action);
+            }
+        });
+
     }
 
     @Override
@@ -156,12 +164,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
             return;
         }
 
-        Action item = data.remove(fromPosition);
-        data.add(toPosition, item);
+        viewModel.moveShortcut(fromPosition, toPosition);
     }
 
     @Override
-    public boolean onCheckCanStartDrag(@NonNull MyViewHolder holder, int position, int x, int y) {
+    public boolean onCheckCanStartDrag(@NonNull ViewHolder holder, int position, int x, int y) {
         return true;
 //        // x, y --- relative from the itemView's top-left
 //        final View containerView = holder.mContainer;
@@ -174,7 +181,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.MyViewHold
     }
 
     @Override
-    public ItemDraggableRange onGetItemDraggableRange(@NonNull MyViewHolder holder, int position) {
+    public ItemDraggableRange onGetItemDraggableRange(@NonNull ViewHolder holder, int position) {
         // no drag-sortable range specified
         return null;
     }

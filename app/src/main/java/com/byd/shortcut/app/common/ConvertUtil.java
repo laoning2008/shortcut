@@ -15,7 +15,7 @@ public class ConvertUtil {
     private static Gson gson = new Gson();
 
     public static DbShortcut shortcutRpc2Db(Shortcut shortcut) {
-        return new DbShortcut(shortcut.modifiedTime, shortcut.type, shortcut.title, gson.toJson(shortcut.tasks));
+        return new DbShortcut(shortcut.id, shortcut.modifiedTime, shortcut.type, shortcut.title, gson.toJson(shortcut.tasks));
     }
 
     public static List<DbShortcut> shortcutListRpc2Db(List<Shortcut> shortcuts) {

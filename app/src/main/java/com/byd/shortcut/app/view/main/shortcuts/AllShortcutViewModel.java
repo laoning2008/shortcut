@@ -24,4 +24,12 @@ public class AllShortcutViewModel extends ViewModel {
     public LiveData<List<Shortcut>> getShortcuts() {
         return repository.getAllShortcut();
     }
+
+    public void moveShortcut(int fromPosition, int toPosition) {
+        repository.moveShortcut(fromPosition, toPosition);
+    }
+
+    public void deleteShortcut(Shortcut shortcut) {
+        repository.deleteShortcut(shortcut.id);
+    }
 }

@@ -18,12 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.byd.shortcut.R;
-import com.byd.shortcut.app.common.ConnectorListDividerDecorator;
-import com.byd.shortcut.app.common.NavigationUtil;
+import com.byd.shortcut.app.view.navigation.NavigationUtil;
 import com.byd.shortcut.bridge.Shortcut;
 import com.byd.shortcut.databinding.FragmentMyShortcutBinding;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.decoration.SimpleListDividerDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
@@ -75,7 +75,7 @@ public class AllShortcutFragment extends Fragment {
         mRecyclerViewDragDropManager.setInitiateOnMove(false);
 
         //adapter
-        mAdapter = new ShortcutAdapter(viewModel.getShortcuts().getValue());
+        mAdapter = new ShortcutAdapter(viewModel.getShortcuts().getValue(), viewModel);
         viewModel.getShortcuts().observe(getViewLifecycleOwner(), new Observer<List<Shortcut>>() {
             @Override
             public void onChanged(List<Shortcut> shortcuts) {
@@ -91,7 +91,7 @@ public class AllShortcutFragment extends Fragment {
         mRecyclerView.setAdapter(mWrappedAdapter);  // requires *wrapped* adapter
         mRecyclerView.setItemAnimator(animator);
 
-//        mRecyclerView.addItemDecoration(new ConnectorListDividerDecorator(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider_h)));
+        mRecyclerView.addItemDecoration(new SimpleListDividerDecorator(ContextCompat.getDrawable(getContext(), R.drawable.list_divider_normal_h), false));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
     }
@@ -135,7 +135,7 @@ public class AllShortcutFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.toolbar_menu_create_shortcut) {
-            NavigationUtil.startCreateShortcutActivity(getContext());
+            NavigationUtil.navigateToShortcutDetail(getContext(), null);
             return true;
         }
         return super.onOptionsItemSelected(item);

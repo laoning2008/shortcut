@@ -1,8 +1,8 @@
-package com.byd.shortcut.app.model;
+package com.byd.shortcut.app.service;
 
 import com.byd.shortcut.IShortcutExecutionCallback;
 import com.byd.shortcut.IShortcutServiceApi;
-import com.byd.shortcut.app.model.service.IInterfaceChanged;
+import com.byd.shortcut.app.service.IInterfaceChanged;
 import com.byd.shortcut.bridge.IShortcutExecutor;
 
 public class ShortcutExecutorProxy implements IShortcutExecutor, IInterfaceChanged {
