@@ -19,5 +19,5 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <size android:height="40px"/>
     <size android:width="10px"/>
-    <solid android:color="#66000000"/>
+    <solid android:color="#9B9DA5"/>
 </shape>
