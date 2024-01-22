@@ -16,35 +16,46 @@
 
 package com.byd.shortcut.app.view.createshortcut;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.byd.shortcut.App;
 import com.byd.shortcut.R;
 import com.byd.shortcut.bridge.Action;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements DraggableItemAdapter<ActionAdapter.ViewHolder> {
     private List<Action> data;
     private CreateShortcutViewModel viewModel;
+    private static final String[] PARAM_TYPE = {"剪贴板", "不变值", "动态输入", "获取前第N个Action结果"};
+    private List<String> packages = new ArrayList<>();;
 
     public static class ViewHolder extends AbstractDraggableItemViewHolder {
         public View mContainer;
         public View mDragHandle;
 
+        public Spinner mSpinnerParamType;
+        public Spinner mSpinnerParamAction;
         public EditText mEditTextParam;
-        public EditText mEditTextApp;
+        public Spinner mSpinnerApp;
         public EditText mEditTextAction;
         public ImageView mImageRemove;
 
@@ -52,8 +63,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             super(v);
             mContainer = v.findViewById(R.id.container);
             mDragHandle = v.findViewById(R.id.container);
-            mEditTextParam = v.findViewById(R.id.et_param);
-            mEditTextApp = v.findViewById(R.id.et_package);
+            mSpinnerParamType = v.findViewById(R.id.spinner_param_type);
+            mSpinnerParamAction = v.findViewById(R.id.spinner_param_action);
+            mEditTextParam = v.findViewById(R.id.et_param_value);
+            mSpinnerApp = v.findViewById(R.id.spinner_package);
             mEditTextAction = v.findViewById(R.id.et_action);
             mImageRemove = v.findViewById(R.id.im_delete);
         }
@@ -62,6 +75,8 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public ActionAdapter(List<Action> data, CreateShortcutViewModel viewModel) {
         this.data = data;
         this.viewModel = viewModel;
+
+        getPackages();
 
         // DraggableItemAdapter requires stable ID, and also
         // have to implement the getItemId() method appropriately.
@@ -92,14 +107,56 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         return new ViewHolder(v);
     }
 
+
+    private void getPackages() {
+        PackageManager pm = App.getContext().getPackageManager();
+        List<PackageInfo> apps = pm.getInstalledPackages(PackageManager.GET_ACTIVITIES);
+        for (PackageInfo info : apps) {
+            if (info.activities == null) {
+                continue;
+            }
+
+            packages.add(info.packageName);
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Action action = data.get(position);
 
         // set text
-        holder.mEditTextParam.setText(action.param);
-        holder.mEditTextApp.setText(action.app);
+        if (action.type == Action.ACTION_TYPE_CONST_VALUE) {
+            holder.mEditTextParam.setText(action.paramValue);
+        } else if (action.type == Action.ACTION_TYPE_DYNAMIC_VALUE) {
+            holder.mEditTextParam.setText(action.paramTitle);
+        }
+
         holder.mEditTextAction.setText(action.action);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(holder.mSpinnerApp.getContext(), R.layout.spinner_row, packages);
+        holder.mSpinnerApp.setAdapter(adapter);
+
+        int selected = adapter.getPosition(action.app);
+        selected = Math.max(selected, 0);
+        holder.mSpinnerApp.setSelection(selected);
+
+        ArrayAdapter<String> adapterParamType = new ArrayAdapter<String>(holder.mSpinnerParamType.getContext(), R.layout.spinner_row, PARAM_TYPE);
+        holder.mSpinnerParamType.setAdapter(adapterParamType);
+        holder.mSpinnerParamType.setSelection(action.type);
+
+        List<String> actionList = new ArrayList<>();
+        for (int i = 0; i < position; ++i) {
+            actionList.add("第" + String.valueOf(i) + "个Action");
+        }
+        ArrayAdapter<String> adapterParamAction = new ArrayAdapter<String>(holder.mSpinnerParamType.getContext(), R.layout.spinner_row, actionList);
+        holder.mSpinnerParamAction.setAdapter(adapterParamAction);
+        if (action.type == Action.ACTION_TYPE_ACTION_RESULT) {
+            int index = 0;
+            if (action.paramAction < actionList.size()) {
+                index = action.paramAction;
+            }
+            holder.mSpinnerParamAction.setSelection(index);
+        }
 
         holder.mEditTextParam.addTextChangedListener(new TextWatcher() {
             @Override
@@ -107,24 +164,68 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setActionParam(action.id, holder.mEditTextParam.getText().toString());
+                if (action.type == Action.ACTION_TYPE_CONST_VALUE) {
+                    viewModel.setActionParamValue(action.id, holder.mEditTextParam.getText().toString());
+                } else if (action.type == Action.ACTION_TYPE_DYNAMIC_VALUE) {
+                    viewModel.setActionParamTitle(action.id, holder.mEditTextParam.getText().toString());
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        holder.mEditTextApp.addTextChangedListener(new TextWatcher() {
+        holder.mSpinnerParamType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (id == 0) {
+                    holder.mEditTextParam.setVisibility(View.INVISIBLE);
+                    holder.mSpinnerParamAction.setVisibility(View.INVISIBLE);
+                } else if (id == 1) {
+                    holder.mEditTextParam.setVisibility(View.VISIBLE);
+                    holder.mSpinnerParamAction.setVisibility(View.INVISIBLE);
+                    holder.mEditTextParam.setHint("输入参数");
+                } else if (id == 2) {
+                    holder.mEditTextParam.setVisibility(View.VISIBLE);
+                    holder.mSpinnerParamAction.setVisibility(View.INVISIBLE);
+                    holder.mEditTextParam.setHint("输入参数说明");
+                } else if (id == 3) {
+                    holder.mEditTextParam.setVisibility(View.INVISIBLE);
+                    holder.mSpinnerParamAction.setVisibility(View.VISIBLE);
+                } else {
+                    return;
+                }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.setActionApp(action.id, holder.mEditTextApp.getText().toString());
+                viewModel.setActionParamType(action.id, position);
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        holder.mSpinnerParamAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (action.type == Action.ACTION_TYPE_ACTION_RESULT) {
+                    viewModel.setActionParamAction(action.id, (int)id);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        holder.mSpinnerApp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                viewModel.setActionApp(action.id, (String) holder.mSpinnerApp.getAdapter().getItem((int)id));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
         holder.mEditTextAction.addTextChangedListener(new TextWatcher() {
@@ -146,7 +247,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                 viewModel.deleteAction(action);
             }
         });
-
     }
 
     @Override
@@ -170,14 +270,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public boolean onCheckCanStartDrag(@NonNull ViewHolder holder, int position, int x, int y) {
         return true;
-//        // x, y --- relative from the itemView's top-left
-//        final View containerView = holder.mContainer;
-//        final View dragHandleView = holder.mDragHandle;
-//
-//        final int offsetX = containerView.getLeft() + (int) (containerView.getTranslationX() + 0.5f);
-//        final int offsetY = containerView.getTop() + (int) (containerView.getTranslationY() + 0.5f);
-//
-//        return ViewUtils.hitTest(dragHandleView, x - offsetX, y - offsetY);
     }
 
     @Override

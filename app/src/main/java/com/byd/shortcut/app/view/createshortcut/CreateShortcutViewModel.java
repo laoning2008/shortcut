@@ -1,6 +1,6 @@
 package com.byd.shortcut.app.view.createshortcut;
 
-import android.util.Log;
+import android.text.TextUtils;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -13,11 +13,6 @@ import com.byd.shortcut.bridge.Action;
 import com.byd.shortcut.bridge.Shortcut;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.lifecycle.HiltViewModel;
 
 public class CreateShortcutViewModel extends ViewModel {
     private ShortcutRepository repository;
@@ -55,7 +50,7 @@ public class CreateShortcutViewModel extends ViewModel {
         }
 
         long id =  MiscUtils.uniqueId();
-        newActions.add(new Action(id, 0, new String(), new String(), new String()));
+        newActions.add(new Action(id, 0, new String(), new String(), 0, new String(), new String()));
         actions.setValue(newActions);
     }
 
@@ -63,43 +58,116 @@ public class CreateShortcutViewModel extends ViewModel {
         this.title.setValue(title);
     }
 
-    public void setActionParam(long id, String param) {
-        List<Action> newActions = actions.getValue();
+    public void setActionParamType(long id, int type) {
+        ArrayList<Action> newActions = actions.getValue();
         if (newActions == null) {
             return;
         }
 
         for (Action action : newActions) {
             if (action.id == id) {
-                action.param = param;
+                if (action.type == type) {
+                    return;
+                }
+                action.type = type;
+                break;
             }
         }
+
+//        actions.setValue(newActions);
+    }
+
+    public void setActionParamValue(long id, String param) {
+        ArrayList<Action> newActions = actions.getValue();
+        if (newActions == null) {
+            return;
+        }
+
+        for (Action action : newActions) {
+            if (action.id == id) {
+                if (TextUtils.equals(action.paramValue, param)) {
+                    return;
+                }
+                action.paramValue = param;
+                break;
+            }
+        }
+
+//        actions.setValue(newActions);
+    }
+
+    public void setActionParamTitle(long id, String title) {
+        ArrayList<Action> newActions = actions.getValue();
+        if (newActions == null) {
+            return;
+        }
+
+        for (Action action : newActions) {
+            if (action.id == id) {
+                if (TextUtils.equals(action.paramTitle, title)) {
+                    return;
+                }
+                action.paramTitle = title;
+                break;
+            }
+        }
+
+//        actions.setValue(newActions);
+    }
+
+    public void setActionParamAction(long id, int actionIndex) {
+        ArrayList<Action> newActions = actions.getValue();
+        if (newActions == null) {
+            return;
+        }
+
+        for (Action action : newActions) {
+            if (action.id == id) {
+                if (action.paramAction == actionIndex) {
+                    return;
+                }
+                action.paramAction = actionIndex;
+                break;
+            }
+        }
+
+//        actions.setValue(newActions);
     }
 
     public void setActionApp(long id, String app) {
-        List<Action> newActions = actions.getValue();
+        ArrayList<Action> newActions = actions.getValue();
         if (newActions == null) {
             return;
         }
 
         for (Action action : newActions) {
             if (action.id == id) {
+                if (TextUtils.equals(action.app, app)) {
+                    return;
+                }
                 action.app = app;
             }
         }
+
+//        actions.setValue(newActions);
     }
 
     public void setActionAction(long id, String a) {
-        List<Action> newActions = actions.getValue();
+        ArrayList<Action> newActions = actions.getValue();
         if (newActions == null) {
             return;
         }
 
         for (Action action : newActions) {
             if (action.id == id) {
+                if (TextUtils.equals(action.action, a)) {
+                    return;
+                }
                 action.action = a;
             }
         }
+
+//        actions.setValue(newActions);
     }
 
     public void moveShortcut(int fromPosition, int toPosition) {
@@ -128,6 +196,11 @@ public class CreateShortcutViewModel extends ViewModel {
             shortcut.tasks = actions.getValue();
             repository.updateShortcut(shortcut);
         }
+    }
+
+
+    public void runShortcut() {
+
     }
 
 

@@ -39,17 +39,47 @@
             android:layout_column="0"
             android:layout_margin="10dp"
             />
-        <EditText
-            android:id="@+id/et_param"
+
+        <GridLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:columnCount="2">
+        <Spinner
+            android:id="@+id/spinner_param_type"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_background"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            android:spinnerMode="dropdown"
+            />
+        <EditText
+            android:id="@+id/et_param_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center"
+            android:background="@drawable/edit_background"
+            android:layout_marginEnd="20dp"
+            android:singleLine="true"
+            android:layout_column="1"
+            android:textColorHint="@android:color/darker_gray"
+            />
+        <Spinner
+            android:id="@+id/spinner_param_action"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_background"
             android:layout_gravity="fill_horizontal|center"
             android:layout_marginEnd="20dp"
-            android:singleLine="true"
+            android:spinnerMode="dropdown"
             android:layout_row="0"
             android:layout_column="1"
             />
+        </GridLayout>
 
         <TextView
             android:id="@+id/tv_package"
@@ -60,16 +90,16 @@
             android:layout_row="1"
             android:layout_column="0"
             />
-        <EditText
-            android:id="@+id/et_package"
-            android:layout_width="wrap_content"
+        <Spinner
+            android:id="@+id/spinner_package"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_background"
             android:layout_gravity="fill_horizontal|center"
             android:layout_marginEnd="20dp"
-            android:singleLine="true"
             android:layout_row="1"
             android:layout_column="1"
+            android:spinnerMode="dropdown"
             />
 
         <TextView

@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -86,7 +87,9 @@ public class CreateShortcutActivity extends BaseActivity {
         viewModel.getTitle().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
-                if (!s.equals(binding.etTitle.getText().toString())) {
+                if (s == null) {
+                    binding.etTitle.setText("");
+                } else if (!s.equals(binding.etTitle.getText().toString())) {
                     binding.etTitle.setText(s);
                 }
             }
@@ -120,23 +123,6 @@ public class CreateShortcutActivity extends BaseActivity {
         mRecyclerView.addItemDecoration(new ConnectorListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider_h)));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
-
-//        PackageManager pm = getPackageManager();
-//        List<PackageInfo> apps = pm.getInstalledPackages(PackageManager.GET_ACTIVITIES| PackageManager.GET_INTENT_FILTERS);
-//        for (PackageInfo info : apps) {
-//            Log.i("shortcut_tag", "packageName = " + info.packageName);
-//            if (info.activities == null) {
-//                continue;
-//            }
-//            for (ActivityInfo activityInfo: info.activities) {
-//                if (!activityInfo.exported || !activityInfo.enabled) {
-//                    continue;
-//                }
-//
-//
-//                Log.i("shortcut_tag", "name = " + activityInfo.name);
-//            }
-//        }
     }
 
     @Override
@@ -189,6 +175,7 @@ public class CreateShortcutActivity extends BaseActivity {
             addNewAction();
             return true;
         } else if (item.getItemId() == R.id.toolbar_menu_create_shortcut_run) {
+            runShortcut();
             return true;
         }
 
@@ -197,5 +184,10 @@ public class CreateShortcutActivity extends BaseActivity {
 
     private void addNewAction() {
         viewModel.addNewAction();
+    }
+
+
+    private void runShortcut() {
+        viewModel.runShortcut();
     }
 }

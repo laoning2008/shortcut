@@ -6,4 +6,8 @@
     <string name="title_shortcut_center">快捷指令中心</string>
 
     <string name="title_create_shortcut">创建快捷指令</string>
+
+<!--    <string-array name="param_type_list">-->
+<!--        <item>剪贴板</item>-->
+<!--    </string-array>-->
 </resources>
