@@ -45,7 +45,7 @@ import java.util.List;
 public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements DraggableItemAdapter<ActionAdapter.ViewHolder> {
     private List<Action> data;
     private CreateShortcutViewModel viewModel;
-    private static final String[] PARAM_TYPE = {"剪贴板", "不变值", "动态输入", "获取前第N个Action结果"};
+    private static final String[] PARAM_TYPE = {"剪贴板", "常量", "动态输入", "获取前第N个Action的结果"};
     private List<String> packages = new ArrayList<>();;
 
     public static class ViewHolder extends AbstractDraggableItemViewHolder {
