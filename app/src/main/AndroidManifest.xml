@@ -3,7 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <queries>
+        <package android:name="com.byd.task" />
+        <package android:name="com.byd.shortcut" />
+    </queries>
 
     <application
         android:name=".App"
@@ -17,22 +25,27 @@
         android:theme="@style/Theme.Shortcut"
         tools:targetApi="31">
         <activity
+            android:name=".app.view.task.TaskActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.byd.shortcut.task" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".app.view.createshortcut.CreateShortcutActivity"
-            android:exported="false">
+            android:exported="true">
         </activity>
 
         <receiver
             android:name=".AppBroadcastReceiver"
             android:enabled="true"
-            android:exported="true" />
-
-<!--        android:process="com.byd.shortcut.service"-->
-
+            android:exported="true" /> <!-- android:process="com.byd.shortcut.service" -->
         <service
             android:name=".service.ShortcutService"
-            android:process="com.byd.shortcut.service"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:process="com.byd.shortcut.service">
             <intent-filter>
                 <action android:name="com.byd.shortcut.service" />
             </intent-filter>

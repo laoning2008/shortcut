@@ -5,11 +5,9 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 public interface IShortcutRepository {
-    boolean createShortcut(Shortcut shortcut);
-
     boolean deleteShortcut(String id);
 
-    boolean updateShortcut(Shortcut shortcut);
+    boolean insertOrUpdateShortcut(Shortcut shortcut);
 
     LiveData<List<Shortcut>> getAllShortcut();
 

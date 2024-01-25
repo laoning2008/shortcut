@@ -1,9 +1,11 @@
 package com.byd.shortcut.app.view.createshortcut;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,10 +21,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.byd.shortcut.App;
 import com.byd.shortcut.R;
 import com.byd.shortcut.app.common.BaseActivity;
 import com.byd.shortcut.app.common.ConnectorListDividerDecorator;
 import com.byd.shortcut.app.data.ShortcutRepository;
+import com.byd.shortcut.app.view.task.TaskActivity;
 import com.byd.shortcut.bridge.Action;
 import com.byd.shortcut.bridge.Shortcut;
 import com.byd.shortcut.databinding.ActivityCreateShortcutBinding;
@@ -32,6 +36,7 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.inject.Inject;
 
@@ -53,6 +58,10 @@ public class CreateShortcutActivity extends BaseActivity {
     @Inject
     ShortcutRepository shortcutRepository;
 
+
+    @Inject
+    ThreadPoolExecutor threadPoolExecutor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +72,7 @@ public class CreateShortcutActivity extends BaseActivity {
             shortcut = (Shortcut)b.getParcelable(PARAM_KEY_SHORTCUT, Shortcut.class);
         }
 
-        viewModel = new ViewModelProvider(this, new CreateShortcutViewModel.ViewModelFactory(shortcutRepository, shortcut)).get(CreateShortcutViewModel.class);
+        viewModel = new ViewModelProvider(this, new CreateShortcutViewModel.ViewModelFactory(shortcutRepository, shortcut, threadPoolExecutor)).get(CreateShortcutViewModel.class);
 
         binding = ActivityCreateShortcutBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -123,6 +132,9 @@ public class CreateShortcutActivity extends BaseActivity {
         mRecyclerView.addItemDecoration(new ConnectorListDividerDecorator(ContextCompat.getDrawable(this, R.drawable.list_divider_h)));
 
         mRecyclerViewDragDropManager.attachRecyclerView(mRecyclerView);
+
+
+//        runShortcut();
     }
 
     @Override
@@ -186,8 +198,7 @@ public class CreateShortcutActivity extends BaseActivity {
         viewModel.addNewAction();
     }
 
-
     private void runShortcut() {
-        viewModel.runShortcut();
+        viewModel.runShortcut(this, getLifecycle(), getActivityResultRegistry());
     }
 }

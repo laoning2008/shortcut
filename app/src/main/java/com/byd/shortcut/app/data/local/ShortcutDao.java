@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
@@ -24,14 +25,11 @@ public abstract class ShortcutDao {
     @Query("SELECT * FROM shortcuts WHERE id = :shortcutId")
     public abstract LiveData<DbShortcut> findById(long shortcutId);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertAll(DbShortcut... shortcuts);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertAll2(List<DbShortcut> shortcuts);
-
-    @Update
-    public abstract int update(DbShortcut shortcut);
 
     @Delete
     public abstract void delete(DbShortcut shortcut);

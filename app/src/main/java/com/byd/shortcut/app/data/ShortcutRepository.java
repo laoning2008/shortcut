@@ -30,20 +30,14 @@ public class ShortcutRepository implements IShortcutRepository {
         });
     }
 
-    public boolean createShortcut(Shortcut shortcut) {
-        DbShortcut dbShortcut = ConvertUtil.shortcutRpc2Db(shortcut);
-        shortcutDao.insertAll(dbShortcut);
-        return true;
-    }
-
     public boolean deleteShortcut(String id) {
         shortcutDao.deleteById(id);
         return true;
     }
 
-    public boolean updateShortcut(Shortcut shortcut) {
+    public boolean insertOrUpdateShortcut(Shortcut shortcut) {
         DbShortcut dbShortcut = ConvertUtil.shortcutRpc2Db(shortcut);
-        shortcutDao.update(dbShortcut);
+        shortcutDao.insertAll(dbShortcut);
         return true;
     }
 

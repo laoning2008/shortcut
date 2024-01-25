@@ -9,6 +9,10 @@ import com.byd.shortcut.app.data.ShortcutRepository;
 import com.byd.shortcut.app.data.local.ShortcutDao;
 import com.byd.shortcut.app.data.local.ShortcutDatabase;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -33,5 +37,11 @@ public class ApplicationModule {
     @Singleton
     public static ShortcutDao shortcutDao(ShortcutDatabase database){
         return database.shortcutDao();
+    }
+
+    @Provides
+    @Singleton
+    public static ThreadPoolExecutor threadPoolExecutor() {
+        return new ScheduledThreadPoolExecutor(4);
     }
 }
