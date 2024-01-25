@@ -279,8 +279,8 @@ public class CreateShortcutViewModel extends ViewModel {
 
     private boolean runAction(Context context, Action action, String param) {
         Intent intent = new Intent(action.action);
-//        intent.setPackage(action.app);
-//        intent.putExtra("param", param);
+        intent.setPackage(action.app);
+        intent.putExtra("param", param);
 
         context.startActivity(intent);
         return true;
